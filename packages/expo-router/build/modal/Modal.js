@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Modal = Modal;
 const non_secure_1 = require("nanoid/non-secure");
 const react_1 = require("react");
+const react_native_1 = require("react-native");
 const ModalContext_1 = require("./ModalContext");
 const useNavigation_1 = require("../useNavigation");
 /**
@@ -34,6 +35,13 @@ function Modal(props) {
     const { openModal, closeModal, addEventListener } = (0, ModalContext_1.useModalContext)();
     const [currentModalId, setCurrentModalId] = (0, react_1.useState)();
     const navigation = (0, useNavigation_1.useNavigation)();
+    (0, react_1.useEffect)(() => {
+        if (props.presentationStyle === 'formSheet' &&
+            process.env.EXPO_OS === 'ios' &&
+            react_native_1.StyleSheet.flatten(props.style)?.flex) {
+            console.warn('The `formSheet` presentation style does not support flex styles on iOS. Please use fixed dimensions for the modal.');
+        }
+    }, [props.style, props.presentationStyle]);
     (0, react_1.useEffect)(() => {
         if (!currentModalId && visible) {
             const newId = (0, non_secure_1.nanoid)();

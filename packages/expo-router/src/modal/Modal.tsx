@@ -3,7 +3,7 @@
 import { type NavigationProp, type ParamListBase } from '@react-navigation/native';
 import { nanoid } from 'nanoid/non-secure';
 import { useEffect, useState } from 'react';
-import { ViewProps } from 'react-native';
+import { StyleSheet, ViewProps } from 'react-native';
 import { type ScreenProps } from 'react-native-screens';
 
 import { useModalContext, type ModalConfig } from './ModalContext';
@@ -102,6 +102,17 @@ export function Modal(props: ModalProps) {
   const { openModal, closeModal, addEventListener } = useModalContext();
   const [currentModalId, setCurrentModalId] = useState<string | undefined>();
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  useEffect(() => {
+    if (
+      props.presentationStyle === 'formSheet' &&
+      process.env.EXPO_OS === 'ios' &&
+      StyleSheet.flatten(props.style)?.flex
+    ) {
+      console.warn(
+        'The `formSheet` presentation style does not support flex styles on iOS. Please use fixed dimensions for the modal.'
+      );
+    }
+  }, [props.style, props.presentationStyle]);
   useEffect(() => {
     if (!currentModalId && visible) {
       const newId = nanoid();
